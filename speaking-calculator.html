@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speaking Revenue Calculator — Big Idea To Bestseller</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #1A1A1A;
+    --off-white: #FFFFFF;
+    --gold: #B8922A;
+    --gold-light: #D4A843;
+    --gold-dim: rgba(184,146,42,0.10);
+    --gold-border: rgba(184,146,42,0.3);
+    --card: #FFFFFF;
+    --card2: #F7F5F2;
+    --text-muted: #888;
+    --text-dim: #AAAAAA;
+    --green: #2E8F5E;
+    --green-dim: rgba(46,143,94,0.10);
+    --page-bg: #F2EFE9;
+    --heading-color: #1A1A1A;
+    --body-text: #1A1A1A;
+  }
+
+  body {
+    background: var(--page-bg);
+    color: var(--body-text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    padding: 60px 24px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse, rgba(184,146,42,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 5vw, 58px);
+    font-weight: 800;
+    line-height: 1.05;
+    color: var(--heading-color);
+  }
+  h1 span { color: var(--gold); }
+  .subtitle {
+    margin-top: 16px;
+    font-size: 16px;
+    color: var(--text-muted);
+    font-weight: 400;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* MODEL SELECTOR */
+  .model-selector {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0 24px;
+    margin-bottom: 40px;
+  }
+  .model-btn {
+    padding: 10px 20px;
+    border-radius: 40px;
+    border: 1px solid var(--gold-border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .model-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .model-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--black);
+    font-weight: 700;
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    gap: 20px;
+  }
+
+  /* CALCULATOR PANEL */
+  .panel {
+    background: var(--card);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--heading-color);
+    margin-bottom: 8px;
+  }
+  .panel-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  /* INPUTS */
+  .inputs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .label-hint {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .field-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card2);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 10px;
+    padding: 0 14px;
+    transition: border-color 0.2s;
+  }
+  .field-row:focus-within { border-color: var(--gold); }
+  .field-row .prefix {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .field-row input[type="number"] {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--body-text);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 12px 0;
+  }
+  .field-row input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  /* SLIDER */
+  .slider-field { grid-column: 1 / -1; }
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .slider-header label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .slider-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: rgba(0,0,0,0.12);
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 1px var(--gold);
+    cursor: pointer;
+  }
+  .slider-ticks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  /* TOGGLE GROUPS */
+  .toggle-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .toggle-btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.12);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .toggle-btn:hover { border-color: var(--gold-border); color: var(--heading-color); }
+  .toggle-btn.active {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* RESULTS */
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .result-card {
+    background: var(--card2);
+    border: 1px solid rgba(0,0,0,0.07);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .result-card.highlight {
+    background: var(--gold-dim);
+    border-color: var(--gold-border);
+  }
+  .result-card.green {
+    background: var(--green-dim);
+    border-color: rgba(46,143,94,0.25);
+  }
+  .result-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .result-value {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(16px, 2vw, 24px);
+    font-weight: 800;
+    color: var(--heading-color);
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .result-card.highlight .result-value { color: var(--gold); }
+  .result-card.green .result-value { color: var(--green); }
+  .result-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* SECTION DIVIDER */
+  .divider {
+    height: 1px;
+    background: rgba(0,0,0,0.08);
+    margin: 28px 0;
+  }
+
+  /* SCENARIO COMPARISON */
+  .scenario-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+    border: 1px solid rgba(0,0,0,0.06);
+    background: var(--card2);
+  }
+  .scenario-row.header-row {
+    background: transparent;
+    border-color: transparent;
+    padding-top: 0;
+  }
+  .scenario-row.header-row span {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .scenario-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--heading-color);
+  }
+  .scenario-name small {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .scenario-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: right;
+    color: var(--heading-color);
+  }
+  .scenario-num.total { color: var(--gold); }
+
+  /* TAG */
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--gold-dim);
+    color: var(--gold);
+    border: 1px solid var(--gold-border);
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* HIDDEN SECTIONS */
+  .model-section { display: none; }
+  .model-section.visible { display: block; }
+
+  /* RESET */
+  .reset-btn {
+    background: transparent;
+    border: 1px solid rgba(0,0,0,0.12);
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 16px;
+  }
+  .reset-btn:hover { border-color: rgba(0,0,0,0.3); color: var(--heading-color); }
+
+  /* TOTAL BANNER */
+  .total-banner {
+    background: linear-gradient(135deg, rgba(184,146,42,0.10), rgba(184,146,42,0.04));
+    border: 1px solid var(--gold-border);
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .total-banner::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 400px; height: 200px;
+    background: radial-gradient(ellipse, rgba(184,146,42,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .total-banner-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  .total-banner-value {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(48px, 8vw, 80px);
+    font-weight: 800;
+    color: var(--heading-color);
+    line-height: 1;
+  }
+  .total-banner-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 12px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .panel { padding: 20px; }
+    .scenario-row { grid-template-columns: 2fr 1fr 1fr; }
+    .scenario-row .scenario-num:last-child { display: none; }
+    .scenario-row.header-row span:last-child { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="eyebrow">Big Idea To Bestseller</div>
+  <h1>Your Book Is a<br><span>Revenue Machine.</span></h1>
+  <p class="subtitle">See exactly how much money your book can generate across every speaking model.</p>
+</div>
+
+<!-- MODEL SELECTOR -->
+<div class="model-selector">
+  <button class="model-btn active" onclick="setModel('speaker-fee')">🎤 Speaker Fee</button>
+  <button class="model-btn" onclick="setModel('back-of-room')">📚 Back of Room</button>
+  <button class="model-btn" onclick="setModel('fee-plus-books')">💎 Fee + Books</button>
+  <button class="model-btn" onclick="setModel('live-event')">🎟️ Live Event</button>
+  <button class="model-btn" onclick="setModel('pay-to-speak')">🚀 Pay to Speak</button>
+  <button class="model-btn" onclick="setModel('all')">📊 All Models</button>
+</div>
+
+<div class="main">
+
+  <!-- ===================== SPEAKER FEE ===================== -->
+  <div class="model-section visible" id="section-speaker-fee">
+    <div class="panel">
+      <div class="panel-title">Speaker Fee Model</div>
+      <div class="panel-desc">You command a speaking fee. Your book is the credential that gets you booked and justifies the rate. How many stages do you need to hit your number?</div>
+      <div class="inputs-grid">
+        <div class="field">
+          <label>Speaker Fee (per gig)</label>
+          <div class="field-row"><span class="prefix">$</span><input type="number" id="sf-fee" value="5000" min="0" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Gigs Per Month</label>
+          <div class="field-row"><input type="number" id="sf-gigs-month" value="2" min="0" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Gigs Per Year <span class="label-hint">(auto)</span></label>
+          <div class="field-row" style="opacity:0.5;pointer-events:none;"><input type="number" id="sf-gigs-year" value="24" min="0" readonly></div>
+        </div>
+      </div>
+      <div class="results-grid">
+        <div class="result-card"><div class="result-label">Per Gig</div><div class="result-value" id="sf-r-gig">$5,000</div></div>
+        <div class="result-card"><div class="result-label">Monthly</div><div class="result-value" id="sf-r-month">$10,000</div></div>
+        <div class="result-card highlight"><div class="result-label">Annual Revenue</div><div class="result-value" id="sf-r-year">$120,000</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== BACK OF ROOM ===================== -->
+  <div class="model-section" id="section-back-of-room">
+    <div class="panel">
+      <div class="panel-title">Back of Room Book Sales</div>
+      <div class="panel-desc">You speak for free (or low fee), then sell your book at the back. Pure credibility play. Every sale is profit.</div>
+      <div class="inputs-grid">
+        <div class="field">
+          <label>People in Room</label>
+          <div class="field-row"><input type="number" id="bor-room" value="100" min="1" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Book Price <span class="label-hint">(avg. $20)</span></label>
+          <div class="field-row"><span class="prefix">$</span><input type="number" id="bor-price" value="20" min="1" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Cost Per Book <span class="label-hint">($2–$5)</span></label>
+          <div class="field-row"><span class="prefix">$</span><input type="number" id="bor-cost" value="3" min="0" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Events Per Month</label>
+          <div class="field-row"><input type="number" id="bor-events" value="2" min="0" oninput="calc()"></div>
+        </div>
+        <div class="slider-field">
+          <div class="slider-header">
+            <label>Conversion Rate</label>
+            <div class="slider-val"><span id="bor-conv-val">20</span>%</div>
+          </div>
+          <input type="range" id="bor-conv" min="1" max="80" value="20" oninput="updateSlider('bor-conv','bor-conv-val');calc()">
+          <div class="slider-ticks"><span>1%</span><span>20%</span><span>40%</span><span>60%</span><span>80%</span></div>
+        </div>
+      </div>
+      <div class="results-grid">
+        <div class="result-card"><div class="result-label">Books Sold / Event</div><div class="result-value" id="bor-r-books">20</div></div>
+        <div class="result-card"><div class="result-label">Profit / Event</div><div class="result-value" id="bor-r-event">$400</div></div>
+        <div class="result-card"><div class="result-label">Monthly Revenue</div><div class="result-value" id="bor-r-month">$800</div></div>
+        <div class="result-card highlight"><div class="result-label">Annual Revenue</div><div class="result-value" id="bor-r-year">$9,600</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== LIVE EVENT ===================== -->
+  <div class="model-section" id="section-live-event">
+    <div class="panel">
+      <div class="panel-title">Live Event + Stage Pitch</div>
+      <div class="panel-desc">You host your own event, fill the room, and pitch your high-ticket offer from the stage. The book gives you the authority to sell.</div>
+      <div class="inputs-grid">
+        <div class="field">
+          <label>Ticket Price</label>
+          <div class="field-row"><span class="prefix">$</span><input type="number" id="le-ticket" value="500" min="0" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Paid Attendees</label>
+          <div class="field-row"><input type="number" id="le-attendees" value="50" min="0" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Gifted Tickets</label>
+          <div class="field-row"><input type="number" id="le-gifted" value="10" min="0" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Backend Offer Price</label>
+          <div class="field-row"><span class="prefix">$</span><input type="number" id="le-offer" value="10000" min="0" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Event Cost <span class="label-hint">(what you pay to host)</span></label>
+          <div class="field-row"><span class="prefix">$</span><input type="number" id="le-cost" value="5000" min="0" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Events Per Year</label>
+          <div class="field-row"><input type="number" id="le-events-year" value="2" min="0" oninput="calc()"></div>
+        </div>
+        <div class="slider-field">
+          <div class="slider-header">
+            <label>Stage Conversion Rate</label>
+            <div class="slider-val"><span id="le-conv-val">10</span>%</div>
+          </div>
+          <input type="range" id="le-conv" min="0" max="100" value="10" oninput="updateSlider('le-conv','le-conv-val');calc()">
+          <div class="slider-ticks"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+        </div>
+      </div>
+      <!-- Row 1: revenue breakdown -->
+      <div class="results-grid" style="margin-bottom:12px;">
+        <div class="result-card"><div class="result-label">Ticket Revenue</div><div class="result-value" id="le-r-tickets">$25,000</div></div>
+        <div class="result-card"><div class="result-label">Total in Room</div><div class="result-value" id="le-r-room">60</div></div>
+        <div class="result-card"><div class="result-label">Backend Closes</div><div class="result-value" id="le-r-closes">6</div></div>
+        <div class="result-card"><div class="result-label">Backend Revenue</div><div class="result-value" id="le-r-backend">$60,000</div></div>
+      </div>
+      <!-- Row 2: totals -->
+      <div class="results-grid">
+        <div class="result-card"><div class="result-label">Total Revenue</div><div class="result-value" id="le-r-total">$85,000</div></div>
+        <div class="result-card"><div class="result-label">Net Profit / Event</div><div class="result-value" id="le-r-profit">$80,000</div></div>
+        <div class="result-card highlight"><div class="result-label">Annual Revenue</div><div class="result-value" id="le-r-year">$160,000</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== FEE + BOOKS ===================== -->
+  <div class="model-section" id="section-fee-plus-books">
+    <div class="panel">
+      <div class="panel-title">Speaker Fee + Book Sales <span class="tag">Best of Both</span></div>
+      <div class="panel-desc">You get paid to speak AND sell books at the back. The fee covers your time, the books are bonus revenue. Stack both.</div>
+      <div class="inputs-grid">
+        <div class="field">
+          <label>Speaker Fee</label>
+          <div class="field-row"><span class="prefix">$</span><input type="number" id="fb-fee" value="5000" min="0" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>People in Room</label>
+          <div class="field-row"><input type="number" id="fb-room" value="100" min="1" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Book Price <span class="label-hint">(avg. $20)</span></label>
+          <div class="field-row"><span class="prefix">$</span><input type="number" id="fb-price" value="20" min="1" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Cost Per Book <span class="label-hint">($2–$5)</span></label>
+          <div class="field-row"><span class="prefix">$</span><input type="number" id="fb-cost" value="3" min="0" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Speaking Gigs Per Month</label>
+          <div class="field-row"><input type="number" id="fb-events" value="2" min="0" oninput="calc()"></div>
+        </div>
+        <div class="slider-field">
+          <div class="slider-header">
+            <label>Book Conversion Rate</label>
+            <div class="slider-val"><span id="fb-conv-val">20</span>%</div>
+          </div>
+          <input type="range" id="fb-conv" min="1" max="80" value="20" oninput="updateSlider('fb-conv','fb-conv-val');calc()">
+          <div class="slider-ticks"><span>1%</span><span>20%</span><span>40%</span><span>60%</span><span>80%</span></div>
+        </div>
+      </div>
+      <!-- Row 1: per-event breakdown -->
+      <div class="results-grid" style="margin-bottom:12px;grid-template-columns:repeat(3,1fr);">
+        <div class="result-card"><div class="result-label">Fee / Event</div><div class="result-value" id="fb-r-fee">$5,000</div></div>
+        <div class="result-card"><div class="result-label">Book Profit / Event</div><div class="result-value" id="fb-r-books">$340</div></div>
+        <div class="result-card"><div class="result-label">Total / Event</div><div class="result-value" id="fb-r-event">$5,340</div></div>
+      </div>
+      <!-- Row 2: the book's impact -->
+      <div class="results-grid" style="margin-bottom:12px;grid-template-columns:repeat(1,1fr);">
+        <div class="result-card" style="background:linear-gradient(135deg,rgba(184,146,42,0.10),rgba(184,146,42,0.04));border-color:var(--gold-border);display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:120px;">
+            <div class="result-label">📖 Revenue Increase From Your Book</div>
+            <div style="font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,42px);font-weight:800;color:var(--gold);line-height:1;" id="fb-r-pct-increase">+6.8%</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:4px;" id="fb-r-pct-sub">Your book adds $340 per gig on top of your fee</div>
+          </div>
+          <div style="flex:1;min-width:120px;border-left:1px solid var(--gold-border);padding-left:20px;">
+            <div class="result-label">Extra Per Year From Book</div>
+            <div style="font-family:'Syne',sans-serif;font-size:clamp(20px,3vw,32px);font-weight:800;color:var(--gold);line-height:1;" id="fb-r-book-year-extra">$8,160</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Pure book revenue annually</div>
+          </div>
+        </div>
+      </div>
+      <!-- Row 3: monthly + annual -->
+      <div class="results-grid" style="grid-template-columns:repeat(2,1fr);">
+        <div class="result-card"><div class="result-label">Monthly Revenue</div><div class="result-value" id="fb-r-month">$10,680</div></div>
+        <div class="result-card highlight"><div class="result-label">Annual Revenue</div><div class="result-value" id="fb-r-year">$128,160</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAY TO SPEAK ===================== -->
+  <div class="model-section" id="section-pay-to-speak">
+    <div class="panel">
+      <div class="panel-title">Pay to Speak → High-Ticket Close</div>
+      <div class="panel-desc">You invest to get on stage — then more than make it back by converting the room into high-ticket clients. The math has to work. Let's check it.</div>
+      <div class="inputs-grid">
+        <div class="field">
+          <label>Stage Investment</label>
+          <div class="field-row"><span class="prefix">$</span><input type="number" id="pts-invest" value="5000" min="0" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>People in Room</label>
+          <div class="field-row"><input type="number" id="pts-room" value="100" min="1" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Offer Price</label>
+          <div class="field-row"><span class="prefix">$</span><input type="number" id="pts-offer" value="15000" min="0" oninput="calc()"></div>
+        </div>
+        <div class="field">
+          <label>Events Per Year</label>
+          <div class="field-row"><input type="number" id="pts-events-year" value="12" min="0" oninput="calc()"></div>
+        </div>
+        <div class="slider-field">
+          <div class="slider-header">
+            <label>Conversion Rate</label>
+            <div class="slider-val"><span id="pts-conv-val">3</span>%</div>
+          </div>
+          <input type="range" id="pts-conv" min="1" max="30" value="3" oninput="updateSlider('pts-conv','pts-conv-val');calc()">
+          <div class="slider-ticks"><span>1%</span><span>5%</span><span>10%</span><span>20%</span><span>30%</span></div>
+        </div>
+      </div>
+      <!-- Row 1: per event breakdown — 3 cols -->
+      <div class="results-grid" style="margin-bottom:12px;grid-template-columns:repeat(3,1fr);">
+        <div class="result-card"><div class="result-label">Clients / Event</div><div class="result-value" id="pts-r-clients">3</div></div>
+        <div class="result-card"><div class="result-label">Gross / Event</div><div class="result-value" id="pts-r-gross">$45,000</div></div>
+        <div class="result-card"><div class="result-label">Investment / Event</div><div class="result-value" id="pts-r-invest-event" style="color:#C0392B;">-$5,000</div></div>
+      </div>
+      <!-- Row 2: net + ROI — 3 cols -->
+      <div class="results-grid" style="margin-bottom:12px;grid-template-columns:repeat(3,1fr);">
+        <div class="result-card"><div class="result-label">Net / Event</div><div class="result-value" id="pts-r-net">$40,000</div></div>
+        <div class="result-card green"><div class="result-label">ROI / Event</div><div class="result-value" id="pts-r-roi">800%</div><div class="result-sub" id="pts-roi-note">You're printing money</div></div>
+        <div class="result-card"><div class="result-label">Avg Per Month</div><div class="result-value" id="pts-r-month">$40,000</div></div>
+      </div>
+      <!-- Row 3: annual investment + annual net — 3 cols -->
+      <div class="results-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="result-card"><div class="result-label">Total Annual Investment</div><div class="result-value" id="pts-r-invest-year" style="color:#C0392B;">-$60,000</div></div>
+        <div class="result-card highlight" style="grid-column:span 2;"><div class="result-label">Annual Net Revenue</div><div class="result-value" id="pts-r-year">$480,000</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== ALL MODELS ===================== -->
+  <div class="model-section" id="section-all">
+    <div class="panel">
+      <div class="panel-title">Revenue Comparison — All Models</div>
+      <div class="panel-desc">Side-by-side annual revenue across every speaking strategy. Numbers pull from your inputs above.</div>
+      <div class="divider"></div>
+      <div class="scenario-row header-row">
+        <span>Model</span>
+        <span style="text-align:right">Per Event</span>
+        <span style="text-align:right">Monthly</span>
+        <span style="text-align:right">Annual</span>
+      </div>
+      <div class="scenario-row">
+        <div class="scenario-name">🎤 Speaker Fee Only<small>Pure fee model</small></div>
+        <div class="scenario-num" id="all-sf-event">$5,000</div>
+        <div class="scenario-num" id="all-sf-month">$10,000</div>
+        <div class="scenario-num total" id="all-sf-year">$120,000</div>
+      </div>
+      <div class="scenario-row">
+        <div class="scenario-name">📚 Back of Room<small>Free speak + book sales</small></div>
+        <div class="scenario-num" id="all-bor-event">$400</div>
+        <div class="scenario-num" id="all-bor-month">$800</div>
+        <div class="scenario-num total" id="all-bor-year">$9,600</div>
+      </div>
+      <div class="scenario-row">
+        <div class="scenario-name">🎟️ Live Event (1 event)<small>Ticket + stage pitch</small></div>
+        <div class="scenario-num" id="all-le-event">$70,000</div>
+        <div class="scenario-num">—</div>
+        <div class="scenario-num total" id="all-le-year">$70,000</div>
+      </div>
+      <div class="scenario-row">
+        <div class="scenario-name">💎 Fee + Books<small>Paid to speak + back of room</small></div>
+        <div class="scenario-num" id="all-fb-event">$5,400</div>
+        <div class="scenario-num" id="all-fb-month">$10,800</div>
+        <div class="scenario-num total" id="all-fb-year">$129,600</div>
+      </div>
+      <div class="scenario-row">
+        <div class="scenario-name">🚀 Pay to Speak<small>Stage investment + HT close</small></div>
+        <div class="scenario-num" id="all-pts-event">$40,000</div>
+        <div class="scenario-num">—</div>
+        <div class="scenario-num total" id="all-pts-year">$40,000</div>
+      </div>
+    </div>
+
+    <!-- TOTAL BANNER -->
+    <div class="total-banner">
+      <div class="total-banner-label">Maximum Revenue Potential</div>
+      <div class="total-banner-value" id="grand-total">$369,200</div>
+      <div class="total-banner-sub">If you ran every model once per month (minus single-event models) — this is what your book makes possible.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function fmt(n) {
+  if (n >= 1000000) return '$' + (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return '$' + Math.round(n).toLocaleString();
+  return '$' + Math.round(n);
+}
+function fmtNum(n) { return Math.round(n).toLocaleString(); }
+function pct(n) { return Math.round(n) + '%'; }
+
+function updateSlider(sliderId, valId) {
+  document.getElementById(valId).textContent = document.getElementById(sliderId).value;
+}
+
+function calc() {
+  // SPEAKER FEE
+  const sfFee = +document.getElementById('sf-fee').value || 0;
+  const sfGigsM = +document.getElementById('sf-gigs-month').value || 0;
+  const sfGigsY = sfGigsM * 12;
+  document.getElementById('sf-gigs-year').value = sfGigsY;
+  const sfMonth = sfFee * sfGigsM;
+  const sfYear = sfFee * sfGigsY;
+  document.getElementById('sf-r-gig').textContent = fmt(sfFee);
+  document.getElementById('sf-r-month').textContent = fmt(sfMonth);
+  document.getElementById('sf-r-year').textContent = fmt(sfYear);
+
+  // BACK OF ROOM
+  const borRoom = +document.getElementById('bor-room').value || 1;
+  const borPrice = +document.getElementById('bor-price').value || 0;
+  const borCost = +document.getElementById('bor-cost').value || 0;
+  const borEvents = +document.getElementById('bor-events').value || 0;
+  const borConv = +document.getElementById('bor-conv').value / 100;
+  const borBooks = Math.round(borRoom * borConv);
+  const borProfit = borBooks * (borPrice - borCost);
+  const borMonth = borProfit * borEvents;
+  const borYear = borMonth * 12;
+  document.getElementById('bor-r-books').textContent = fmtNum(borBooks);
+  document.getElementById('bor-r-event').textContent = fmt(borProfit);
+  document.getElementById('bor-r-month').textContent = fmt(borMonth);
+  document.getElementById('bor-r-year').textContent = fmt(borYear);
+
+  // LIVE EVENT
+  const leTicket = +document.getElementById('le-ticket').value || 0;
+  const leAttendees = +document.getElementById('le-attendees').value || 0;
+  const leGifted = +document.getElementById('le-gifted').value || 0;
+  const leOffer = +document.getElementById('le-offer').value || 0;
+  const leCost = +document.getElementById('le-cost').value || 0;
+  const leEventsYear = +document.getElementById('le-events-year').value || 0;
+  const leConv = +document.getElementById('le-conv').value / 100;
+  const leTotalRoom = leAttendees + leGifted;
+  const leTicketRev = leTicket * leAttendees;
+  const leCloses = Math.round(leTotalRoom * leConv);
+  const leBackend = leCloses * leOffer;
+  const leTotalRev = leTicketRev + leBackend;
+  const leProfit = leTotalRev - leCost;
+  const leYear = leProfit * leEventsYear;
+  document.getElementById('le-r-tickets').textContent = fmt(leTicketRev);
+  document.getElementById('le-r-room').textContent = fmtNum(leTotalRoom);
+  document.getElementById('le-r-closes').textContent = fmtNum(leCloses);
+  document.getElementById('le-r-backend').textContent = fmt(leBackend);
+  document.getElementById('le-r-total').textContent = fmt(leTotalRev);
+  document.getElementById('le-r-profit').textContent = fmt(leProfit);
+  document.getElementById('le-r-year').textContent = fmt(leYear);
+
+  // FEE + BOOKS
+  const fbFee = +document.getElementById('fb-fee').value || 0;
+  const fbRoom = +document.getElementById('fb-room').value || 1;
+  const fbPrice = +document.getElementById('fb-price').value || 0;
+  const fbCost = +document.getElementById('fb-cost').value || 0;
+  const fbEvents = +document.getElementById('fb-events').value || 0;
+  const fbConv = +document.getElementById('fb-conv').value / 100;
+  const fbBooks = Math.round(fbRoom * fbConv);
+  const fbBookProfit = fbBooks * (fbPrice - fbCost);
+  const fbTotal = fbFee + fbBookProfit;
+  const fbMonth = fbTotal * fbEvents;
+  const fbYear = fbMonth * 12;
+  const fbBookYearExtra = fbBookProfit * fbEvents * 12;
+  const fbPctIncrease = fbFee > 0 ? ((fbBookProfit / fbFee) * 100) : 0;
+  document.getElementById('fb-r-fee').textContent = fmt(fbFee);
+  document.getElementById('fb-r-books').textContent = fmt(fbBookProfit);
+  document.getElementById('fb-r-event').textContent = fmt(fbTotal);
+  document.getElementById('fb-r-pct-increase').textContent = '+' + fbPctIncrease.toFixed(1) + '%';
+  document.getElementById('fb-r-pct-sub').textContent = 'Your book adds ' + fmt(fbBookProfit) + ' per gig on top of your fee';
+  document.getElementById('fb-r-book-year-extra').textContent = fmt(fbBookYearExtra);
+  document.getElementById('fb-r-month').textContent = fmt(fbMonth);
+  document.getElementById('fb-r-year').textContent = fmt(fbYear);
+
+  // PAY TO SPEAK
+  const ptsInvest = +document.getElementById('pts-invest').value || 0;
+  const ptsRoom = +document.getElementById('pts-room').value || 1;
+  const ptsOffer = +document.getElementById('pts-offer').value || 0;
+  const ptsEventsY = +document.getElementById('pts-events-year').value || 0;
+  const ptsConv = +document.getElementById('pts-conv').value / 100;
+  const ptsClients = Math.round(ptsRoom * ptsConv);
+  const ptsGross = ptsClients * ptsOffer;
+  const ptsNet = ptsGross - ptsInvest;
+  const ptsYear = ptsNet * ptsEventsY;
+  const ptsMonth = ptsYear / 12;
+  const ptsTotalInvest = ptsInvest * ptsEventsY;
+  const ptsRoi = ptsInvest > 0 ? ((ptsNet / ptsInvest) * 100) : 0;
+  document.getElementById('pts-r-clients').textContent = fmtNum(ptsClients);
+  document.getElementById('pts-r-gross').textContent = fmt(ptsGross);
+  document.getElementById('pts-r-invest-event').textContent = '-' + fmt(ptsInvest);
+  document.getElementById('pts-r-net').textContent = fmt(ptsNet);
+  document.getElementById('pts-r-roi').textContent = pct(ptsRoi);
+  document.getElementById('pts-roi-note').textContent = ptsRoi >= 500 ? "You're printing money" : ptsRoi >= 100 ? "Solid return" : ptsRoi >= 0 ? "Breakeven zone" : "Check your numbers";
+  document.getElementById('pts-r-month').textContent = fmt(ptsMonth);
+  document.getElementById('pts-r-invest-year').textContent = '-' + fmt(ptsTotalInvest);
+  document.getElementById('pts-r-year').textContent = fmt(ptsYear);
+
+  // ALL MODELS COMPARISON
+  document.getElementById('all-sf-event').textContent = fmt(sfFee);
+  document.getElementById('all-sf-month').textContent = fmt(sfMonth);
+  document.getElementById('all-sf-year').textContent = fmt(sfYear);
+  document.getElementById('all-bor-event').textContent = fmt(borProfit);
+  document.getElementById('all-bor-month').textContent = fmt(borMonth);
+  document.getElementById('all-bor-year').textContent = fmt(borYear);
+  document.getElementById('all-le-event').textContent = fmt(leProfit);
+  document.getElementById('all-le-year').textContent = fmt(leYear);
+  document.getElementById('all-fb-event').textContent = fmt(fbTotal);
+  document.getElementById('all-fb-month').textContent = fmt(fbMonth);
+  document.getElementById('all-fb-year').textContent = fmt(fbYear);
+  document.getElementById('all-pts-event').textContent = fmt(ptsNet);
+  document.getElementById('all-pts-year').textContent = fmt(ptsYear);
+
+  // GRAND TOTAL
+  const grand = sfYear + borYear + leYear + fbYear + ptsYear;
+  document.getElementById('grand-total').textContent = fmt(grand);
+}
+
+function setModel(model) {
+  // Update buttons
+  document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  // Hide all sections
+  document.querySelectorAll('.model-section').forEach(s => s.classList.remove('visible'));
+
+  // Show target
+  if (model === 'all') {
+    document.getElementById('section-all').classList.add('visible');
+  } else {
+    document.getElementById('section-' + model).classList.add('visible');
+  }
+}
+
+// Init sliders
+updateSlider('bor-conv','bor-conv-val');
+updateSlider('le-conv','le-conv-val');
+updateSlider('fb-conv','fb-conv-val');
+updateSlider('pts-conv','pts-conv-val');
+calc();
+</script>
+</body>
+</html>
