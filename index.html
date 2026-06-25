@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIB Calculators — Big Idea To Bestseller</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #B8922A;
+    --gold-border: rgba(184,146,42,0.3);
+    --gold-dim: rgba(184,146,42,0.10);
+    --page-bg: #F2EFE9;
+    --card: #FFFFFF;
+    --text-muted: #888;
+  }
+  body {
+    background: var(--page-bg);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 800;
+    color: #1A1A1A;
+    text-align: center;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  h1 span { color: var(--gold); }
+  .subtitle {
+    font-size: 16px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 48px;
+    max-width: 480px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    width: 100%;
+    max-width: 800px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-decoration: none;
+    transition: all 0.2s;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+  .card:hover {
+    border-color: var(--gold-border);
+    background: var(--gold-dim);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  }
+  .card-icon { font-size: 32px; margin-bottom: 14px; }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1A1A1A;
+    margin-bottom: 6px;
+  }
+  .card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+</style>
+</head>
+<body>
+  <div class="eyebrow">Big Idea To Bestseller</div>
+  <h1>Your Book Is a<br><span>Revenue Machine.</span></h1>
+  <p class="subtitle">Choose a calculator to see exactly what your book is worth.</p>
+  <div class="grid">
+    <a class="card" href="/speaking-calculator">
+      <div class="card-icon">🎤</div>
+      <div class="card-title">Speaking Revenue</div>
+      <div class="card-desc">Calculate income across every speaking model — from speaker fees to live events.</div>
+    </a>
+    <a class="card" href="/personal-roi-calculator">
+      <div class="card-icon">🙋</div>
+      <div class="card-title">Personal ROI</div>
+      <div class="card-desc">See the personal impact your book creates — visibility, credibility, and opportunities.</div>
+    </a>
+    <a class="card" href="/brand-roi-calculator">
+      <div class="card-icon">💼</div>
+      <div class="card-title">Brand ROI</div>
+      <div class="card-desc">Measure how your book builds your brand and drives long-term business growth.</div>
+    </a>
+    <a class="card" href="/financial-roi-calculator">
+      <div class="card-icon">💰</div>
+      <div class="card-title">Financial ROI</div>
+      <div class="card-desc">Calculate the direct financial return your book generates across all revenue streams.</div>
+    </a>
+  </div>
+</body>
+</html>
